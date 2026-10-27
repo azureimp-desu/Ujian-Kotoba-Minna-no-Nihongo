@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ujian Kotoba Bab 33</title><style>
+:root{--bg:#f3f6f4;--ink:#1c2b2a;--mute:#5d6f6c;--card:#fff;--line:#cfdad7;--accent:#1f6f6b;--ok:#2e7d4f;--bad:#b3392f}
+@media (prefers-color-scheme:dark){:root{--bg:#121a19;--ink:#e6efed;--mute:#93a7a3;--card:#1b2625;--line:#2f3f3d;--accent:#5cc0b8;--ok:#5fc489;--bad:#ef7f74}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans JP","Hiragino Sans","Segoe UI",sans-serif;line-height:1.5}
+main{max-width:560px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:1.4rem;margin:0 0 4px}p.sub{color:var(--mute);margin:0 0 20px}
+a{color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px}
+.bar{height:6px;background:var(--line);border-radius:3px;margin-bottom:16px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+.meta{color:var(--mute);font-size:.9rem;display:flex;justify-content:space-between}
+.q{font-size:2rem;margin:14px 0 4px;font-weight:600;word-break:break-word}
+.hint{color:var(--mute);font-size:.95rem;margin-bottom:16px;min-height:1.4em}
+.opts{display:grid;gap:8px}
+button{font:inherit;color:inherit;cursor:pointer}
+.opt{text-align:left;padding:12px 14px;background:transparent;border:1px solid var(--line);border-radius:8px}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt:focus-visible,.btn:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.opt.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 15%,transparent)}
+.opt.bad{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 15%,transparent)}
+.btn{margin:16px 8px 0 0;padding:11px 20px;border:0;border-radius:8px;background:var(--accent);color:#fff;font-weight:600;text-decoration:none;display:inline-block}
+.btn.alt{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+@media (prefers-color-scheme:dark){.btn{color:#0b1514}}
+.score{font-size:3rem;font-weight:700;margin:8px 0}
+.review{margin:16px 0 0;padding:0;list-style:none;font-size:.95rem}
+.review li{padding:8px 0;border-top:1px solid var(--line)}
+.review b{color:var(--bad)}.review .right{color:var(--ok);font-weight:700}
+.hidden{display:none}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+.grid a{display:block;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--card);text-decoration:none;color:var(--ink)}
+.grid a:hover{border-color:var(--accent)}.grid small{color:var(--mute);display:block}
+</style></head><body><main>
+<p><a href="index.html">&larr; Semua bab</a></p>
+<h1>Ujian Kotoba Bab 33</h1><p class="sub">Pilih arti yang benar dari kata Jepang. Bab ini ada 68 kata.</p>
+<div class="card" id="start"><p>Soal diacak setiap kali mulai.</p><button class="btn" id="go">Mulai (20 soal)</button><button class="btn alt" id="goall">Semua kata (68)</button></div>
+<div class="card hidden" id="quiz"><div class="bar"><i id="prog"></i></div><div class="meta"><span id="num"></span><span id="sc"></span></div>
+<div class="q" id="word"></div><div class="hint" id="read"></div><div class="opts" id="opts"></div><button class="btn hidden" id="next">Lanjut</button></div>
+<div class="card hidden" id="end"><div class="meta"><span>Hasil ujian</span></div><div class="score" id="final"></div><div id="msg"></div><ul class="review" id="review"></ul>
+<button class="btn" id="again">Ulangi</button><a class="btn alt" href="index.html">Bab lain</a></div>
+</main><script>
+const WORDS=[["にげます", "逃げます", "Melarikan diri"], ["さわぎます", "騒ぎます", "Berbuat gaduh, ribut"], ["あきらめます", "", "Menerima nasib, putus asa"], ["なげます", "投げます", "Melempar"], ["まもります", "守ります", "Mematuhi"], ["あげます", "上げます", "Menaikkan"], ["さげます", "下げます", "Menurunkan"], ["つたえます", "伝えます", "Menyampaikan"], ["ちゅういします （に）", "注意します", "Memperhatikan"], ["はずします （せきを）", "外します", "Tidak ada (ditempat)"], ["だめな", "", "Jangan,tidak boleh,tidak bisa"], ["せき", "席", "Tempat duduk"], ["ファイト", "", "Berjuang"], ["マーク", "", "Tanda"], ["ボール", "", "Bola"], ["せんたくき", "洗濯機", "Mesin cuci"], ["～き", "～機", "Mesin ～"], ["きそく", "規則", "Peraturan"], ["しようきんし", "使用禁止", "Dilarang pakai"], ["たちいりきんし", "立入禁止", "Dilarang masuk"], ["いりぐち", "入口", "Pintu masuk"], ["でぐち", "出口", "Pintu keluar"], ["ひじょうぐち", "非常口", "Pintu darurat"], ["むりょう", "無料", "Gratis"], ["ほんじつきゅうぎょう", "本日休業", "Hari ini tutup"], ["えいぎょうちゅう", "営業中", "Buka"], ["しようちゅう", "使用中", "Sedang dipakai"], ["～ちゅう", "～中", "Sedang～/dalam ～"], ["どういう～", "", "Apa ～/ bagaimana ～"], ["もう", "", "Tidak ～lagi (diikuti dengan bentuk negatif)"], ["あと～", "", "Tinggal ～lagi"], ["ちゅうしゃいはん", "駐車違反", "Pelanggaran parkir"], ["そりゃあ", "", "Hal itu"], ["～いない", "～以内", "Dalam ～"], ["けいさつ", "警察", "Polisi"], ["ばっきん", "罰金", "Denda"], ["でんぽう", "電報", "Telegram"], ["ひとびと", "人々", "Orang-orang"], ["きゅうよう", "急用", "Urusan/tugas mendadak"], ["うちます （を）", "打ちます", "Mengirim (telegram)"], ["でんぽうだい", "電報代", "Biaya telegram"], ["できるだけ", "", "Sebisa mungkin / sedapat mungkin"], ["みじかく", "短く", "Dengan pendek/singkat"], ["また", "", "Dan"], ["たとえば", "例えば", "Misalnya,contohnya"], ["キトク", "", "Yang gawat, koma"], ["おもいびょうき", "重い病気", "Sakit keras/parah"], ["あす", "明日", "Besok"], ["るす", "留守", "Tidak ada di rumah"], ["るすばん", "留守番", "Penjaga rumah (ketika yang punya rumah bepergian)"], ["おいわい", "お祝い", "Perayaan"], ["なくなります", "亡くなります", "Meninggal"], ["かなしみ", "悲しみ", "Kesedihan,rasa sedih"], ["りようします", "利用します", "Memakai,menggunakan"], ["ひょうしき", "標識", "Petunjuk"], ["じゅんびちゅう", "準備中", "Dalam persiapan"], ["へいてん", "閉店", "Tutup"], ["ていきゅうび", "定休日", "Hari libur tetap"], ["けしょうしつ", "化粧室", "Kamar kecil"], ["きんえんせき", "禁煙席", "Tempat duduk bebas rokok"], ["よやくせき", "予約席", "Tempat duduk yang telah dipesan"], ["かきげんきん", "火気厳禁", "Mudah terbakar, larangan menyalakan api"], ["うんてんしょしんしゃちゅうい", "運転初心者注意", "Tanda bagi pengemudi yang baru mendapatkan SIM"], ["こうじちゅう", "工事中", "Dalam perbaikan"], ["えんそけいひょうはくざいふか", "塩素系漂白剤不可", "Jangan gunakan pemutih"], ["てあらい", "手洗い", "Cuci dengan tangan"], ["アイロン（ていおん）", "アイロン（低温）", "Harus disetrika dalam suhu rendah"], ["ドライクリーニング", "", "Hanya untuk di dry cleaning"]];
+
+const $=id=>document.getElementById(id);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+let qs,idx,score,wrong,locked;
+function start(n){
+  qs=shuffle(WORDS).slice(0,n);idx=0;score=0;wrong=[];
+  $("start").classList.add("hidden");$("end").classList.add("hidden");$("quiz").classList.remove("hidden");show();
+}
+function show(){
+  locked=false;const [w,k,a]=qs[idx];
+  $("num").textContent="Soal "+(idx+1)+" dari "+qs.length;$("sc").textContent="Benar: "+score;
+  $("prog").style.width=(idx/qs.length*100)+"%";
+  $("word").textContent=w;$("read").textContent=k?"Kanji: "+k:"";
+  const pool=[...new Set(WORDS.map(x=>x[2]).filter(t=>t!==a))];
+  const box=$("opts");box.innerHTML="";
+  shuffle([a,...shuffle(pool).slice(0,3)]).forEach(t=>{
+    const b=document.createElement("button");b.className="opt";b.textContent=t;b.onclick=()=>pick(b,t,a);box.appendChild(b);
+  });
+  $("next").classList.add("hidden");
+}
+function pick(btn,t,a){
+  if(locked)return;locked=true;
+  document.querySelectorAll(".opt").forEach(o=>{o.disabled=true;if(o.textContent===a)o.classList.add("ok")});
+  if(t===a){score++}else{btn.classList.add("bad");wrong.push([...qs[idx],t])}
+  $("sc").textContent="Benar: "+score;
+  $("next").textContent=idx===qs.length-1?"Lihat hasil":"Lanjut";$("next").classList.remove("hidden");$("next").focus();
+}
+function finish(){
+  $("quiz").classList.add("hidden");$("end").classList.remove("hidden");
+  const pct=Math.round(score/qs.length*100);
+  $("final").textContent=score+" / "+qs.length+" ("+pct+"%)";
+  $("msg").textContent=pct>=80?"Bagus sekali!":pct>=60?"Lumayan, ulangi sedikit lagi.":"Perlu belajar lagi, semangat!";
+  const ul=$("review");ul.innerHTML="";
+  if(wrong.length){
+    const h=document.createElement("li");h.style.border="0";h.textContent="Yang salah:";ul.appendChild(h);
+    wrong.forEach(([w,k,a,t])=>{
+      const li=document.createElement("li");
+      li.innerHTML="<strong></strong><br>Jawabanmu: <b></b><br>Jawaban benar: <span class='right'></span>";
+      li.querySelector("strong").textContent=w+(k?" ("+k+")":"");li.querySelector("b").textContent=t;li.querySelector(".right").textContent=a;ul.appendChild(li);
+    });
+  }else{const li=document.createElement("li");li.style.border="0";li.textContent="Semua jawabanmu benar!";ul.appendChild(li)}
+}
+$("again").onclick=()=>{$("end").classList.add("hidden");$("start").classList.remove("hidden")};
+$("next").onclick=()=>{idx++;idx<qs.length?show():finish()};
+
+$("go").onclick=()=>start(20);
+if($("goall"))$("goall").onclick=()=>start(WORDS.length);
+</script></body></html>
