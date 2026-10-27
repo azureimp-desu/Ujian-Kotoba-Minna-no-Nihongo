@@ -29,54 +29,66 @@ button{font:inherit;color:inherit;cursor:pointer}
 .review li{padding:8px 0;border-top:1px solid var(--line)}
 .review b{color:var(--bad)}.review .right{color:var(--ok);font-weight:700}
 .hidden{display:none}
+.opt.sel{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 15%,transparent)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.best{color:var(--mute);margin:0 0 4px}
+.note{color:var(--mute);font-size:.9rem;margin-top:4px}
+.grid small.ok{color:var(--ok);font-weight:700}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
 .grid a{display:block;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--card);text-decoration:none;color:var(--ink)}
 .grid a:hover{border-color:var(--accent)}.grid small{color:var(--mute);display:block}
 </style></head><body><main>
 <p><a href="index.html">&larr; Semua bab</a></p>
 <h1>Ujian Kotoba Bab 3</h1><p class="sub">Pilih arti yang benar dari kata Jepang. Bab ini ada 67 kata.</p>
-<div class="card" id="start"><p>Soal diacak setiap kali mulai.</p><button class="btn" id="go">Mulai (20 soal)</button><button class="btn alt" id="goall">Semua kata (67)</button></div>
+<div class="card" id="start"><p class="best" id="best"></p><p>Soal diacak setiap kali mulai. Benar atau salahnya baru ditampilkan setelah ujian selesai.</p><button class="btn" id="go">Mulai (20 soal)</button><button class="btn alt" id="goall">Semua kata (67)</button></div>
 <div class="card hidden" id="quiz"><div class="bar"><i id="prog"></i></div><div class="meta"><span id="num"></span><span id="sc"></span></div>
-<div class="q" id="word"></div><div class="hint" id="read"></div><div class="opts" id="opts"></div><button class="btn hidden" id="next">Lanjut</button></div>
-<div class="card hidden" id="end"><div class="meta"><span>Hasil ujian</span></div><div class="score" id="final"></div><div id="msg"></div><ul class="review" id="review"></ul>
-<button class="btn" id="again">Ulangi</button><a class="btn alt" href="index.html">Bab lain</a></div>
+<div class="q" id="word"></div><div class="hint" id="read"></div><div class="opts" id="opts"></div><button class="btn" id="submit" disabled>Lanjut</button><button class="btn hidden" id="next">Lanjut</button></div>
+<div class="card hidden" id="end"><div class="meta"><span>Hasil ujian</span></div><div class="score" id="final"></div><div id="msg"></div><div class="note" id="note"></div><ul class="review" id="review"></ul>
+<button class="btn hidden" id="retry">Ulangi yang salah</button><button class="btn" id="again">Ulangi</button><a class="btn alt" href="index.html">Bab lain</a></div>
 </main><script>
+const BAB=3;
 const WORDS=[["ここ", "", "Disini"], ["そこ", "", "Disitu"], ["あそこ", "", "Disana"], ["どこ", "", "Dimana?"], ["こちら", "", "Disini"], ["そちら", "", "Disitu"], ["あちら", "", "Disana"], ["どちら", "", "Dimana ?"], ["きょうしつ", "教室", "Ruang kelas"], ["しょくどう", "食堂", "Ruang makan, Kantin"], ["じむしょ", "事務所", "Kantor"], ["かいぎしつ", "会議室", "Ruang rapat"], ["うけつけ", "受付", "Meja informasi"], ["ロビー", "", "Ruang tunggu, lobi"], ["へや", "部屋", "Kamar"], ["おてあらい", "お手洗い", "Kamar kecil, WC"], ["トイレ", "", "Toilet"], ["かいだん", "階段", "Tangga"], ["エレベーター", "", "Lift"], ["エスカレーター", "", "Eskalator, tangga berjalan"], ["じどうはんばいき", "自動販売機", "Mesin jual otomatis"], ["でんわ", "電話", "Telepon"], ["おくに", "お国", "Negara"], ["かいしゃ", "会社", "Perusahaan"], ["うち", "家", "Rumah"], ["くつ", "靴", "Sepatu"], ["ネクタイ", "", "Dasi"], ["ワイン", "", "Anggur putih"], ["うりば", "売り場", "Tempat penjualan"], ["ちか", "地下", "Bawah tanah , basement"], ["～かい", "～階", "lantai～/ tingkat～"], ["なんがい", "何階", "Lantai berapa?"], ["～えん", "～円", "～yen"], ["いくら", "", "Berapa?"], ["ひゃく", "百", "Seratus"], ["せん", "千", "Seribu"], ["まん", "万", "Puluh ribu"], ["すみません", "", "Maaf"], ["どうも", "", "Terima kasih"], ["いらっしゃいませ", "", "Selamat datang"], ["みせてください", "見せてください", "Tolong perlihatkan"], ["じゃ", "", "Kalau begitu"], ["～をください", "", "Tolong ～"], ["イタリア", "", "Italia"], ["スイス", "", "Swis"], ["フランス", "", "Perancis"], ["ジャカルタ", "", "Jakarta"], ["バンコク", "", "Bangkok"], ["ベルリン", "", "Berlin"], ["おくじょう", "屋上", "Lantai atas"], ["レストラン", "", "Restoran"], ["ゆうえんち", "遊園地", "Tempat hiburan"], ["もよおしものかいじょう", "催し物会場", "Tempat pertunjukan"], ["めがね", "眼鏡", "Kacamata"], ["スポーツようひん", "スポーツ用品", "Peralatan olahraga"], ["りょこうようひん", "旅行用品", "Peralatan wisata"], ["こどものふく", "子供の服", "Pakaian anak"], ["おもちゃ", "", "Mainan"], ["ぶんぼうぐ", "文房具", "Alat tulis"], ["かぐ", "家具", "Perlengkapan rumah"], ["しょっき", "食器", "Peralatan makan"], ["でんかせいひん", "電化製品", "Barang elektronik"], ["しんしふく", "紳士服", "Pakaian pria"], ["ふじんふく", "婦人服", "Pakaian wanita"], ["アクセサリー", "", "Perhiasan, aksesoris"], ["けしょうひん", "化粧品", "Kosmetik"], ["しょくひん", "食品", "Makanan"]];
-
 const $=id=>document.getElementById(id);
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
-let qs,idx,score,wrong,locked;
-function start(n){
-  qs=shuffle(WORDS).slice(0,n);idx=0;score=0;wrong=[];
+let qs,idx,score,wrong,locked,sel,retry;
+const KEY="kotoba:bab"+BAB;
+function load(){try{return JSON.parse(localStorage.getItem(KEY))}catch(e){return null}}
+function save(pct){try{const o=load()||{best:0,runs:0};o.runs++;if(pct>o.best)o.best=pct;if(pct===100)o.perfect=true;localStorage.setItem(KEY,JSON.stringify(o))}catch(e){}}
+function showBest(){const o=load();$("best").textContent=o?(o.perfect?"✓ Sudah pernah nilai sempurna. ":"")+"Nilai terbaik: "+o.best+"% ("+o.runs+"x ujian)":"Belum pernah ujian bab ini."}
+function start(n,list){
+  retry=!!list;qs=list?shuffle(list):shuffle(WORDS).slice(0,n);idx=0;score=0;wrong=[];
   $("start").classList.add("hidden");$("end").classList.add("hidden");$("quiz").classList.remove("hidden");show();
 }
 function show(){
-  locked=false;const [w,k,a]=qs[idx];
-  $("num").textContent="Soal "+(idx+1)+" dari "+qs.length;$("sc").textContent="Benar: "+score;
+  locked=false;sel=null;const [w,k,a]=qs[idx];
+  $("num").textContent=(retry?"Ulangi yang salah: ":"")+"Soal "+(idx+1)+" dari "+qs.length;$("sc").textContent="";
   $("prog").style.width=(idx/qs.length*100)+"%";
   $("word").textContent=w;$("read").textContent=k?"Kanji: "+k:"";
   const pool=[...new Set(WORDS.map(x=>x[2]).filter(t=>t!==a))];
   const box=$("opts");box.innerHTML="";
   shuffle([a,...shuffle(pool).slice(0,3)]).forEach(t=>{
-    const b=document.createElement("button");b.className="opt";b.textContent=t;b.onclick=()=>pick(b,t,a);box.appendChild(b);
+    const b=document.createElement("button");b.className="opt";b.textContent=t;
+    b.onclick=()=>{if(locked)return;sel=t;document.querySelectorAll(".opt").forEach(o=>o.classList.toggle("sel",o===b));$("submit").disabled=false};
+    box.appendChild(b);
   });
-  $("next").classList.add("hidden");
+  $("submit").disabled=true;$("submit").textContent=idx===qs.length-1?"Selesai":"Lanjut";$("next").classList.add("hidden");
 }
-function pick(btn,t,a){
-  if(locked)return;locked=true;
-  document.querySelectorAll(".opt").forEach(o=>{o.disabled=true;if(o.textContent===a)o.classList.add("ok")});
-  if(t===a){score++}else{btn.classList.add("bad");wrong.push([...qs[idx],t])}
-  $("sc").textContent="Benar: "+score;
-  $("next").textContent=idx===qs.length-1?"Lihat hasil":"Lanjut";$("next").classList.remove("hidden");$("next").focus();
+function submit(){
+  if(sel===null)return;
+  if(sel===qs[idx][2]){score++}else{wrong.push([...qs[idx],sel])}
+  idx++;idx<qs.length?show():finish();
 }
 function finish(){
   $("quiz").classList.add("hidden");$("end").classList.remove("hidden");
   const pct=Math.round(score/qs.length*100);
   $("final").textContent=score+" / "+qs.length+" ("+pct+"%)";
-  $("msg").textContent=pct>=80?"Bagus sekali!":pct>=60?"Lumayan, ulangi sedikit lagi.":"Perlu belajar lagi, semangat!";
+  if(!retry){save(pct);$("note").textContent=pct===100?"Nilai sempurna tersimpan di bab ini.":"Nilai tersimpan. Nilai terbaik hanya naik kalau hasilmu lebih tinggi."}
+  else{$("note").textContent="Ini latihan ulang, nilainya tidak disimpan."}
+  $("msg").textContent=pct===100?"Sempurna!":pct>=80?"Bagus sekali!":pct>=60?"Lumayan, ulangi sedikit lagi.":"Perlu belajar lagi, semangat!";
+  $("retry").classList.toggle("hidden",wrong.length===0);
   const ul=$("review");ul.innerHTML="";
   if(wrong.length){
-    const h=document.createElement("li");h.style.border="0";h.textContent="Yang salah:";ul.appendChild(h);
+    const h=document.createElement("li");h.style.border="0";h.textContent="Yang masih salah:";ul.appendChild(h);
     wrong.forEach(([w,k,a,t])=>{
       const li=document.createElement("li");
       li.innerHTML="<strong></strong><br>Jawabanmu: <b></b><br>Jawaban benar: <span class='right'></span>";
@@ -84,8 +96,11 @@ function finish(){
     });
   }else{const li=document.createElement("li");li.style.border="0";li.textContent="Semua jawabanmu benar!";ul.appendChild(li)}
 }
-$("again").onclick=()=>{$("end").classList.add("hidden");$("start").classList.remove("hidden")};
+$("submit").onclick=submit;
+$("retry").onclick=()=>{const l=wrong.map(x=>x.slice(0,3));start(0,l)};
+$("again").onclick=()=>{$("end").classList.add("hidden");$("start").classList.remove("hidden");showBest()};
 $("next").onclick=()=>{idx++;idx<qs.length?show():finish()};
+showBest();
 
 $("go").onclick=()=>start(20);
 if($("goall"))$("goall").onclick=()=>start(WORDS.length);
